@@ -8,7 +8,7 @@ repositories {
 
 ```
 dependencies {
-    modImplementation "com.github.Pyke-Lee:PykeLib:1.0.2"
+    modImplementation "com.github.Pyke-Lee:PykeLib:1.0.3"
 }
 ```
 
