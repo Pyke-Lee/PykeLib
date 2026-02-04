@@ -5,9 +5,7 @@ import kr.pyke.network.PykeLibPacket;
 import kr.pyke.network.payload.s2c.S2C_SendColorBGBroadcast;
 import kr.pyke.network.payload.s2c.S2C_SendColorBGMessage;
 import net.fabricmc.api.ModInitializer;
-
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import org.slf4j.Logger;
@@ -22,27 +20,24 @@ public class PykeLib implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		PykeLibPacket.registerCodec();
 		PykeLibPacket.registerServer();
 
 		CommandRegistrationCallback.EVENT.register(DebugCommand::register);
 	}
 
 	public static void sendSystemMessage(List<ServerPlayer> players, int color, String message) {
-		S2C_SendColorBGMessage packet = new S2C_SendColorBGMessage(color, message);
-
-		for (ServerPlayer serverPlayer : players) { ServerPlayNetworking.send(serverPlayer, packet); }
+		for (ServerPlayer serverPlayer : players) {
+			S2C_SendColorBGMessage.send(serverPlayer, color, message);
+		}
 	}
 
 	public static void sendSystemMessage(ServerPlayer player, int color, String message) {
-		S2C_SendColorBGMessage packet = new S2C_SendColorBGMessage(color, message);
-
-		ServerPlayNetworking.send(player, packet);
+		S2C_SendColorBGMessage.send(player, color, message);
 	}
 
 	public static void sendBroadcastMessage(List<ServerPlayer> players, int color, String message) {
-		S2C_SendColorBGBroadcast packet = new S2C_SendColorBGBroadcast(color, message);
-
-		for (ServerPlayer serverPlayer : players) { ServerPlayNetworking.send(serverPlayer, packet); }
+		for (ServerPlayer serverPlayer : players) {
+			S2C_SendColorBGBroadcast.send(serverPlayer, color, message);
+		}
 	}
 }

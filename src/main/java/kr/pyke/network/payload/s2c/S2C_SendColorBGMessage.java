@@ -1,35 +1,41 @@
 package kr.pyke.network.payload.s2c;
 
+import io.netty.buffer.Unpooled;
 import kr.pyke.PykeLib;
 import kr.pyke.util.PykeHelper;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.GuiMessageTag;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.server.level.ServerPlayer;
 
-public record S2C_SendColorBGMessage(int color, String message) implements CustomPacketPayload {
-    public static final CustomPacketPayload.Type<S2C_SendColorBGMessage> ID = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(PykeLib.MOD_ID, "s2c_color_bg_message"));
+public class S2C_SendColorBGMessage {
+    public static final ResourceLocation ID = new ResourceLocation(PykeLib.MOD_ID, "s2c_color_bg_message");
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, S2C_SendColorBGMessage> STREAM_CODEC = StreamCodec.composite(
-        ByteBufCodecs.VAR_INT, S2C_SendColorBGMessage::color,
-        ByteBufCodecs.STRING_UTF8, S2C_SendColorBGMessage::message,
-        S2C_SendColorBGMessage::new
-    );
+    public static void send(ServerPlayer player, int color, String message) {
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+        buf.writeVarInt(color);
+        buf.writeUtf(message);
+        ServerPlayNetworking.send(player, ID, buf);
+    }
 
-    @Override public @NotNull CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return ID; }
+    @Environment(EnvType.CLIENT)
+    public static void register() {
+        ClientPlayNetworking.registerGlobalReceiver(ID, (client, handler, buf, responseSender) -> {
+            int color = buf.readVarInt();
+            String message = buf.readUtf();
 
-    public static void handle(S2C_SendColorBGMessage payload, ClientPlayNetworking.Context context) {
-        context.client().execute(() -> {
-            GuiMessageTag messageTag = new GuiMessageTag(payload.color(), null, null, "color_chatbox");
-            Component component = PykeLib.SYSTEM_PREFIX.copy().append(PykeHelper.parseComponent(payload.message()));
+            client.execute(() -> {
+                GuiMessageTag messageTag = new GuiMessageTag(color, null, null, "color_chatbox");
+                Component component = PykeLib.SYSTEM_PREFIX.copy().append(PykeHelper.parseComponent(message));
 
-            Minecraft.getInstance().gui.getChat().addMessage(component, null, messageTag);
+                Minecraft.getInstance().gui.getChat().addMessage(component, null, messageTag);
+            });
         });
     }
 }
