@@ -2,15 +2,12 @@ package kr.pyke.network.payload.s2c;
 
 import io.netty.buffer.Unpooled;
 import kr.pyke.PykeLib;
-import kr.pyke.util.PykeHelper;
+import kr.pyke.client.PykeLibClient;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.client.GuiMessageTag;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -30,12 +27,7 @@ public class S2C_SendColorBGMessage {
             int color = buf.readVarInt();
             String message = buf.readUtf();
 
-            client.execute(() -> {
-                GuiMessageTag messageTag = new GuiMessageTag(color, null, null, "color_chatbox");
-                Component component = PykeLib.SYSTEM_PREFIX.copy().append(PykeHelper.parseComponent(message));
-
-                Minecraft.getInstance().gui.getChat().addMessage(component, null, messageTag);
-            });
+            client.execute(() -> PykeLibClient.sendSystemMessage(color, message));
         });
     }
 }
