@@ -1,58 +1,71 @@
 package kr.pyke.mixin.client;
 
-import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.GuiMessage;
 import net.minecraft.client.GuiMessageTag;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ChatComponent;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.util.ARGB;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.List;
 
 @Mixin(ChatComponent.class)
 public class ChatComponentMixin {
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V", ordinal = 0))
-    private void handleBackgroundFill(GuiGraphics instance, int x1, int y1, int x2, int y2, int color, @Local GuiMessage.Line line) {
-        GuiMessageTag tag = line.tag();
+    @Mixin(targets = "net.minecraft.client.gui.components.ChatComponent$DrawingBackgroundGraphicsAccess")
+    public static abstract class BackgroundMixin {
+        @Shadow @Final private GuiGraphics graphics;
 
-        if (null != tag) {
-            int alpha = (color >> 24) & 0xFF;
-            int startColor = (alpha << 24) | tag.indicatorColor();
+        @Inject(method = "fill(IIIII)V", at = @At("HEAD"), cancellable = true)
+        private void handleCustomBackgroundFill(int x1, int y1, int x2, int y2, int color, CallbackInfo ci) {
+            Minecraft mc = Minecraft.getInstance();
 
-            int middleX = x1 + (int)((x2 - x1) * 0.4);
-            instance.fill(x1, y1, middleX, y2, startColor);
-            this.drawHorizontalGradient(instance, middleX, y1, x2, y2, startColor);
+            ChatComponent chat = mc.gui.getChat();
+            List<GuiMessage.Line> lines = ((ChatComponentAccessor) chat).getTrimmedMessages();
+
+            GuiMessage.Line currentLine = null;
+            if (!lines.isEmpty()) {
+                for (GuiMessage.Line line : lines) {
+                    if (line.tag() != null) {
+                        currentLine = line;
+                        break;
+                    }
+                }
+            }
+
+            if (currentLine != null) {
+                GuiMessageTag tag = currentLine.tag();
+
+                int alpha = ARGB.alpha(color);
+                int indicatorColor = tag.indicatorColor();
+                int startColor = ARGB.color(alpha, indicatorColor);
+                int endColor = ARGB.color(0, indicatorColor);
+                int middleX = x1 + (int) ((x2 - x1) * 0.4);
+
+                this.graphics.fill(x1, y1, middleX, y2, startColor);
+                this.drawHorizontalGradient(this.graphics, middleX, y1, x2, y2, startColor, endColor);
+
+                ci.cancel();
+            }
         }
-    }
 
-    @Unique
-    private void drawHorizontalGradient(GuiGraphics guiGraphics, int x1, int y1, int x2, int y2, int startColor) {
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
+        @Unique
+        private void drawHorizontalGradient(GuiGraphics guiGraphics, int x1, int y1, int x2, int y2, int startColor, int endColor) {
+            int width = x2 - x1;
+            if (width <= 0) { return; }
 
-        var consumer = guiGraphics.bufferSource().getBuffer(RenderType.gui());
-        var matrix = guiGraphics.pose().last().pose();
+            for (int i = 0; i < width; i++) {
+                float delta = (float) i / (float) width;
+                int currentColor = ARGB.srgbLerp(delta, startColor, endColor);
 
-        float a1 = (float)(startColor >> 24 & 255) / 255.0F;
-        float r1 = (float)(startColor >> 16 & 255) / 255.0F;
-        float g1 = (float)(startColor >> 8 & 255) / 255.0F;
-        float b1 = (float)(startColor & 255) / 255.0F;
-
-        float a2 = 0.0f;
-        float r2 = 0.0f;
-        float g2 = 0.0f;
-        float b2 = 0.0f;
-
-        consumer.addVertex(matrix, (float)x1, (float)y1, 0.0F).setColor(r1, g1, b1, a1);
-        consumer.addVertex(matrix, (float)x1, (float)y2, 0.0F).setColor(r1, g1, b1, a1);
-        consumer.addVertex(matrix, (float)x2, (float)y2, 0.0F).setColor(r2, g2, b2, a2);
-        consumer.addVertex(matrix, (float)x2, (float)y1, 0.0F).setColor(r2, g2, b2, a2);
-
-        guiGraphics.flush();
-
-        RenderSystem.disableBlend();
+                guiGraphics.fill(x1 + i, y1, x1 + i + 1, y2, currentColor);
+            }
+        }
     }
 }

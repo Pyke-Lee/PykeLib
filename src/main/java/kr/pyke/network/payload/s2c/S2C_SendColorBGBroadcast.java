@@ -10,11 +10,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 public record S2C_SendColorBGBroadcast(int color, String message) implements CustomPacketPayload {
-    public static final Type<S2C_SendColorBGBroadcast> ID = new Type<>(ResourceLocation.fromNamespaceAndPath(PykeLib.MOD_ID, "s2c_color_bg_broadcast"));
+    public static final Type<S2C_SendColorBGBroadcast> ID = new Type<>(Identifier.fromNamespaceAndPath(PykeLib.MOD_ID, "s2c_color_bg_broadcast"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, S2C_SendColorBGBroadcast> STREAM_CODEC = StreamCodec.composite(
         ByteBufCodecs.VAR_INT, S2C_SendColorBGBroadcast::color,
