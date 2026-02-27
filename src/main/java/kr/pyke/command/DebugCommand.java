@@ -28,6 +28,7 @@ public class DebugCommand {
 
         List<ServerPlayer> serverPlayers = source.getServer().getPlayerList().getPlayers();
         PykeLib.sendSystemMessage(serverPlayers, COLOR.LIME.getColor(), "해당 메시지는 디버그용 테스트 메시지입니다.");
+        PykeLib.sendSystemMessage(serverPlayers, COLOR.RED.getColor(), "해당 메시지는 디버그용 테스트 메시지입니다.");
 
         return 1;
     }

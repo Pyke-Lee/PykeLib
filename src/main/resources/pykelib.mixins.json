@@ -6,8 +6,8 @@
     ],
     "client": [
         "client.ChatComponentAccessor",
-        "client.ChatComponentMixin",
-        "client.ChatComponentMixin$BackgroundMixin"
+        "client.ChatComponentBackgroundMixin",
+        "client.ChatComponentFocusedMixin"
     ],
     "injectors": {
         "defaultRequire": 1
