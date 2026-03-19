@@ -1,12 +1,11 @@
 {
-  "providers": [
-    {
-      "chars": ["ꅑ"],
-      "file": "glyph/exclamation_mark.png",
-      "ascent": 8,
-      "height": 10,
-      "type": "bitmap"
-    }
-  ]
+    "providers": [
+        {
+            "type": "bitmap",
+            "file": "minecraft:glyph/exclamation_mark.png",
+            "ascent": 8,
+            "height": 10,
+            "chars": ["\uE001"]
+        }
+    ]
 }
-

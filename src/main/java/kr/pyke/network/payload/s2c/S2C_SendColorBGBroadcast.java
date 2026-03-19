@@ -27,7 +27,7 @@ public record S2C_SendColorBGBroadcast(int color, String message) implements Cus
     public static void handle(S2C_SendColorBGBroadcast payload, ClientPlayNetworking.Context context) {
         context.client().execute(() -> {
             GuiMessageTag messageTag = new GuiMessageTag(payload.color(), null, null, "color_chatbox");
-            Component component = Component.literal("ꅑ ").append(PykeHelper.parseComponent(payload.message()));
+            Component component = Component.literal("\uE001 ").append(PykeHelper.parseComponent(payload.message()));
 
             Minecraft.getInstance().gui.getChat().addMessage(Component.literal(" "), null, messageTag);
             Minecraft.getInstance().gui.getChat().addMessage(component, null, messageTag);
