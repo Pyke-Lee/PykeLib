@@ -2,8 +2,8 @@ package kr.pyke;
 
 import kr.pyke.command.DebugCommand;
 import kr.pyke.network.PykeLibPacket;
-import kr.pyke.network.payload.s2c.S2C_SendColorBGBroadcast;
-import kr.pyke.network.payload.s2c.S2C_SendColorBGMessage;
+import kr.pyke.network.payload.s2c.S2C_SendColorBGBroadcastPayload;
+import kr.pyke.network.payload.s2c.S2C_SendColorBGMessagePayload;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -29,19 +29,19 @@ public class PykeLib implements ModInitializer {
 	}
 
 	public static void sendSystemMessage(List<ServerPlayer> players, int color, String message) {
-		S2C_SendColorBGMessage packet = new S2C_SendColorBGMessage(color, message);
+		S2C_SendColorBGMessagePayload packet = new S2C_SendColorBGMessagePayload(color, message);
 
 		for (ServerPlayer serverPlayer : players) { ServerPlayNetworking.send(serverPlayer, packet); }
 	}
 
 	public static void sendSystemMessage(ServerPlayer player, int color, String message) {
-		S2C_SendColorBGMessage packet = new S2C_SendColorBGMessage(color, message);
+		S2C_SendColorBGMessagePayload packet = new S2C_SendColorBGMessagePayload(color, message);
 
 		ServerPlayNetworking.send(player, packet);
 	}
 
 	public static void sendBroadcastMessage(List<ServerPlayer> players, int color, String message) {
-		S2C_SendColorBGBroadcast packet = new S2C_SendColorBGBroadcast(color, message);
+		S2C_SendColorBGBroadcastPayload packet = new S2C_SendColorBGBroadcastPayload(color, message);
 
 		for (ServerPlayer serverPlayer : players) { ServerPlayNetworking.send(serverPlayer, packet); }
 	}

@@ -13,18 +13,18 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
-public record S2C_SendColorBGBroadcast(int color, String message) implements CustomPacketPayload {
-    public static final Type<S2C_SendColorBGBroadcast> ID = new Type<>(Identifier.fromNamespaceAndPath(PykeLib.MOD_ID, "s2c_color_bg_broadcast"));
+public record S2C_SendColorBGBroadcastPayload(int color, String message) implements CustomPacketPayload {
+    public static final Type<S2C_SendColorBGBroadcastPayload> ID = new Type<>(Identifier.fromNamespaceAndPath(PykeLib.MOD_ID, "s2c_color_bg_broadcast"));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, S2C_SendColorBGBroadcast> STREAM_CODEC = StreamCodec.composite(
-        ByteBufCodecs.VAR_INT, S2C_SendColorBGBroadcast::color,
-        ByteBufCodecs.STRING_UTF8, S2C_SendColorBGBroadcast::message,
-        S2C_SendColorBGBroadcast::new
+    public static final StreamCodec<RegistryFriendlyByteBuf, S2C_SendColorBGBroadcastPayload> STREAM_CODEC = StreamCodec.composite(
+        ByteBufCodecs.VAR_INT, S2C_SendColorBGBroadcastPayload::color,
+        ByteBufCodecs.STRING_UTF8, S2C_SendColorBGBroadcastPayload::message,
+        S2C_SendColorBGBroadcastPayload::new
     );
 
     @Override public @NotNull CustomPacketPayload.Type<? extends CustomPacketPayload> type() { return ID; }
 
-    public static void handle(S2C_SendColorBGBroadcast payload, ClientPlayNetworking.Context context) {
+    public static void handle(S2C_SendColorBGBroadcastPayload payload, ClientPlayNetworking.Context context) {
         context.client().execute(() -> {
             GuiMessageTag messageTag = new GuiMessageTag(payload.color(), null, null, "color_chatbox");
             Component component = Component.literal("\uE001 ").append(PykeHelper.parseComponent(payload.message()));

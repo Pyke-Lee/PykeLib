@@ -1,4 +1,4 @@
-package kr.pyke.util.constants;
+package kr.pyke.type;
 
 public enum COLOR {
     // ===== 빨강 =====
