@@ -3,8 +3,8 @@ package kr.pyke.network.payload.s2c;
 import kr.pyke.PykeLib;
 import kr.pyke.util.PykeHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.client.GuiMessageTag;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.chat.GuiMessageTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -29,9 +29,9 @@ public record S2C_SendColorBGBroadcast(int color, String message) implements Cus
             GuiMessageTag messageTag = new GuiMessageTag(payload.color(), null, null, "color_chatbox");
             Component component = Component.literal("\uE001 ").append(PykeHelper.parseComponent(payload.message()));
 
-            Minecraft.getInstance().gui.getChat().addMessage(Component.literal(" "), null, messageTag);
-            Minecraft.getInstance().gui.getChat().addMessage(component, null, messageTag);
-            Minecraft.getInstance().gui.getChat().addMessage(Component.literal(" "), null, messageTag);
+            Minecraft.getInstance().gui.getChat().addPlayerMessage(Component.literal(" "), null, messageTag);
+            Minecraft.getInstance().gui.getChat().addPlayerMessage(component, null, messageTag);
+            Minecraft.getInstance().gui.getChat().addPlayerMessage(Component.literal(" "), null, messageTag);
         });
     }
 }

@@ -12,8 +12,8 @@ public class PykeLibPacket {
 
     public static void registerCodec() {
         // S2C (Server → Client)
-        PayloadTypeRegistry.playS2C().register(S2C_SendColorBGMessage.ID, S2C_SendColorBGMessage.STREAM_CODEC);
-        PayloadTypeRegistry.playS2C().register(S2C_SendColorBGBroadcast.ID, S2C_SendColorBGBroadcast.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(S2C_SendColorBGMessage.ID, S2C_SendColorBGMessage.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(S2C_SendColorBGBroadcast.ID, S2C_SendColorBGBroadcast.STREAM_CODEC);
 
         // C2S (Client → Server)
 

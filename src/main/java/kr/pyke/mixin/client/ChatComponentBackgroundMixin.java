@@ -1,15 +1,13 @@
 package kr.pyke.mixin.client;
 
-import net.minecraft.client.GuiMessage;
-import net.minecraft.client.GuiMessageTag;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ChatComponent;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
+import net.minecraft.client.multiplayer.chat.GuiMessageTag;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,17 +20,16 @@ import java.util.List;
 
 @Mixin(targets = "net.minecraft.client.gui.components.ChatComponent$DrawingBackgroundGraphicsAccess")
 public abstract class ChatComponentBackgroundMixin {
-    @Shadow @Final private GuiGraphics graphics;
-
-    @Unique
-    private static final Logger LOGGER = LoggerFactory.getLogger("ChatBackgroundDebug");
+    @Shadow @Final private GuiGraphicsExtractor graphics;
 
     @Inject(method = "fill(IIIII)V", at = @At("HEAD"), cancellable = true)
     private void handleCustomBackgroundFill(int x1, int y1, int x2, int y2, int color, CallbackInfo ci) {
         Minecraft mc = Minecraft.getInstance();
         ChatComponent chat = mc.gui.getChat();
 
-        if (mc.screen != null && y1 > mc.getWindow().getGuiScaledHeight() - 40) { return; }
+        if (mc.screen != null && y1 > mc.getWindow().getGuiScaledHeight() - 40) {
+            return;
+        }
 
         GuiMessage.Line targetLine = getLine(y2, (ChatComponentAccessor) chat, mc);
 
@@ -56,9 +53,11 @@ public abstract class ChatComponentBackgroundMixin {
     }
 
     @Unique
-    private void drawHorizontalGradient(GuiGraphics guiGraphics, int x1, int y1, int x2, int y2, int startColor, int endColor) {
+    private void drawHorizontalGradient(GuiGraphicsExtractor guiGraphics, int x1, int y1, int x2, int y2, int startColor, int endColor) {
         int width = x2 - x1;
-        if (width <= 0) { return; }
+        if (width <= 0) {
+            return;
+        }
 
         for (int i = 0; i < width; i++) {
             float delta = (float) i / (float) width;
@@ -77,15 +76,21 @@ public abstract class ChatComponentBackgroundMixin {
 
         double lineSpacing = mc.options.chatLineSpacing().get();
         int p = (int) (9.0 * (lineSpacing + 1.0));
-        if (p == 0) { return null; }
+        if (p == 0) {
+            return null;
+        }
 
         int lx = (m - y2) / p;
-        if (lx < 0) { return null; }
+        if (lx < 0) {
+            return null;
+        }
 
         int lineIndex = lx + chatAccessor.getChatScrollbarPos();
         List<GuiMessage.Line> lines = chatAccessor.getTrimmedMessages();
 
-        if (lineIndex >= 0 && lineIndex < lines.size()) { return lines.get(lineIndex); }
+        if (lineIndex >= 0 && lineIndex < lines.size()) {
+            return lines.get(lineIndex);
+        }
         return null;
     }
 }
