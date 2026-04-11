@@ -3,7 +3,7 @@ package kr.pyke.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import kr.pyke.PykeLib;
-import kr.pyke.util.constants.COLOR;
+import kr.pyke.type.COLOR;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
